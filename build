@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+rm -rf dist
+mkdir -p dist
+echo "build src/ldcv.ls -> dist/ldcv.js ..."
+npx lsc -cbp src/ldcvmgr.ls > dist/ldcvmgr.js
+
+echo "minifying ldcv.js ..."
+npx uglifyjs dist/ldcvmgr.js > dist/ldcvmgr.min.js
+
+echo "Copy dist/ to web/ ..."
+rm -rf web/static/assets/lib/ldcvmgr/dev
+mkdir -p web/static/assets/lib/ldcvmgr/dev
+cp -R dist/* web/static/assets/lib/ldcvmgr/dev
+echo "done."
