@@ -1,10 +1,12 @@
 ldcvmgr = (opt={}) ->
   @opt = opt
   @evt-handler = {}
-  @path = (opt.path or "/modules/cover").replace(/\/$/, '')
+  @path = opt.path or "/modules/cover"
+  if typeof(@path) == \string => @path = @path.replace(/\/$/,'')
   @loader = if opt.loader => that else new ldLoader className: "ldld full", auto-z: true
   @covers = {}
   @workers = {}
+  @error-handling = false
   @prepare-proxy = proxise (n) ->
   @init!
   @
@@ -14,16 +16,26 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
   error: (n = '', e = {}) ->
     if n == \error => alert "something is wrong; please reload and try again"
-    else @toggle \error
+    else
+      # toggle this so we know that we are handling internal error.
+      @error-handling = true
+      @toggle \error
     console.log(e.message or e)
 
   prepare: (n) ->
     if @covers[n] => return Promise.resolve!
     if @workers[n] => return @prepare-proxy(n)
-    @loader.on 1000
+    # @error-handling means that we are toggling `error` due to internal error,
+    # so loader might already be triggered ( and just dismissed ).
+    # dont wait to make it looks better without blinking effect.
+    if @error-handling =>
+      @loader.on!
+      @error-handling = false
+    else @loader.on 1000
     p = if document.querySelector(".ldcvmgr[data-name=#n]") => Promise.resolve(that)
     else
-      @workers[n] = fetch "#{@path}/#n.html"
+      name = if typeof(@path) == \function => @path(n) else "#{@path}/#n.html"
+      @workers[n] = fetch name
         .then (v) ~>
           if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
           v.text!
@@ -36,13 +48,18 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
             it.parentNode.replaceChild script, it
           root = div.querySelector('.ldcv')
     p
+      .finally ~>
+        @loader.cancel false
       .then (root) ~>
         @covers[n] = new ldCover root: root, lock: root.getAttribute(\data-lock) == \true
         @prepare-proxy.resolve!
         delete @workers[n]
-        debounce 1
-      .finally ~> @loader.cancel false
-      .catch ~> throw it
+        # TODO not sure what is this for. to be remove
+        # new Promise (res, rej) -> setTimeout (-> res!), 1
+      .catch ~>
+        @prepare-proxy.reject it
+        delete @workers[n]
+        throw it
   purge: (n) -> if n? => delete @covers[n] else @covers = {}
   lock: (n, p) ->
     @prepare(n)
