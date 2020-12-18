@@ -21,14 +21,14 @@
   },
   "peerDependencies": {
     "ldloader": "^1.1.1",
-    "proxise": "0.0.1"
+    "proxise": "0.0.1",
+    "ldcover": "^1.1.1"
   },
   "devDependencies": {
     "@loadingio/ldquery": "^1.1.1",
     "bootstrap": "^4.5.3",
     "bootstrap.ldui": "github:loadingio/bootstrap.ldui",
     "bootstrap.native": "^3.0.14",
-    "ldcover": "^1.1.0",
     "ldloader": "^1.1.1",
     "ldview": "0.0.2",
     "livescript": ">=1.6.0",
