@@ -3,7 +3,7 @@
   "name": "ldcvmgr",
   "license": "MIT",
   "description": "ldCover Manager",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "files": [
     "dist/**/*"
   ],
@@ -21,7 +21,7 @@
   },
   "peerDependencies": {
     "ldloader": "^1.1.1",
-    "proxise": "0.0.1",
+    "proxise": "^0.1.2",
     "ldcover": "^1.1.1"
   },
   "devDependencies": {
@@ -30,10 +30,10 @@
     "bootstrap.ldui": "github:loadingio/bootstrap.ldui",
     "bootstrap.native": "^3.0.14",
     "ldloader": "^1.1.1",
-    "ldview": "0.0.2",
-    "livescript": ">=1.6.0",
-    "proxise": "0.0.1",
-    "template": "github:zbryikt/template#v2.1.7",
+    "ldview": "^0.0.2",
+    "livescript": "^1.6.0",
+    "proxise": "^0.1.2",
+    "template": "github:zbryikt/template#v2.3.9",
     "uglify-js": "=3.2.0"
   },
   "frontendDependencies": {
