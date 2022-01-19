@@ -1,4 +1,4 @@
- (function() { function pug_rethrow(n,e,r,t){if(!(n instanceof Error))throw n;if(!("undefined"==typeof window&&e||t))throw n.message+=" on line "+r,n;try{t=t||require("fs").readFileSync(e,"utf8")}catch(e){pug_rethrow(n,null,r)}var i=3,a=t.split("\n"),o=Math.max(r-i,0),h=Math.min(a.length,r+i),i=a.slice(o,h).map(function(n,e){var t=e+o+1;return(t==r?"  > ":"    ")+t+"| "+n}).join("\n");throw n.path=e,n.message=(e||"Pug")+":"+r+"\n"+i+"\n\n"+n.message,n}function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;var pug_debug_filename, pug_debug_line;try {;pug_debug_line = 1;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
+ (function() { function pug_rethrow(e,n,r,t){if(!(e instanceof Error))throw e;if(!("undefined"==typeof window&&n||t))throw e.message+=" on line "+r,e;var o,a,i,s;try{t=t||require("fs").readFileSync(n,{encoding:"utf8"}),o=3,a=t.split("\n"),i=Math.max(r-o,0),s=Math.min(a.length,r+o)}catch(t){return e.message+=" - could not read from "+n+" ("+t.message+")",void pug_rethrow(e,null,r)}o=a.slice(i,s).map(function(e,n){var t=n+i+1;return(t==r?"  > ":"    ")+t+"| "+e}).join("\n"),e.path=n;try{e.message=(n||"Pug")+":"+r+"\n"+o+"\n\n"+e.message}catch(e){}throw e}function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;var pug_debug_filename, pug_debug_line;try {;pug_debug_line = 1;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
 pug_html = pug_html + "\u003Cdiv class=\"ldcvmgr ldcv\"\u003E";
 ;pug_debug_line = 1;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
 pug_html = pug_html + "\u003Cdiv class=\"base\"\u003E";
@@ -13,7 +13,7 @@ pug_html = pug_html + "\u003Cp\u003E";
 ;pug_debug_line = 3;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
 pug_html = pug_html + "this is a sample of ldcvmgr, loaded from remote path.\u003C\u002Fp\u003E";
 ;pug_debug_line = 4;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
-pug_html = pug_html + "\u003Chr\u002F\u003E";
+pug_html = pug_html + "\u003Chr\u003E";
 ;pug_debug_line = 5;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
 pug_html = pug_html + "\u003Cdiv class=\"btn btn-outline-primary\" data-ldcv-set=\"\"\u003E";
 ;pug_debug_line = 5;pug_debug_filename = "src\u002Fpug\u002Fldcv\u002Fsample.pug";
