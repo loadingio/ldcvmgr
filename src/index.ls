@@ -4,6 +4,7 @@ ldcvmgr = (opt={}) ->
   @path = opt.path or "/modules/cover"
   if typeof(@path) == \string => @path = @path.replace(/\/$/,'')
   @loader = if opt.loader => that else new ldloader className: "ldld full", auto-z: true
+  @mgr = opt.manager or null
   @covers = {}
   @workers = {}
   @error-handling = false
@@ -21,8 +22,9 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       @error-handling = true
       @toggle \error
     console.log(e.message or e)
-
-  prepare: (n) ->
+  _id: (o) -> if typeof(o) == \object => @mgr.id(o) else o
+  prepare: (o) ->
+    n = @_id o
     if @covers[n] => return Promise.resolve!
     if @workers[n] => return @prepare-proxy(n)
     # @error-handling means that we are toggling `error` due to internal error,
@@ -32,7 +34,13 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       @loader.on!
       @error-handling = false
     else @loader.on 1000
-    p = if document.querySelector(".ldcvmgr[data-name=#n]") => Promise.resolve(that)
+    p = if typeof(o) == \object =>
+      @workers[n] = @mgr.get o
+        .then (bc) -> bc.create!
+        .then (bi) ~> bi.attach {root: document.body} .then ~>
+          @covers[n] = ret = bi.interface!
+          console.log ret
+    else if document.querySelector(".ldcvmgr[data-name=#n]") => Promise.resolve(that)
     else
       name = if typeof(@path) == \function => @path(n) else "#{@path}/#n.html"
       @workers[n] = fetch name
@@ -51,7 +59,7 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       .finally ~>
         @loader.cancel false
       .then (root) ~>
-        @covers[n] = new ldcover root: root, lock: root.getAttribute(\data-lock) == \true
+        if !@covers[n] => @covers[n] = new ldcover root: root, lock: root.getAttribute(\data-lock) == \true
         @prepare-proxy.resolve!
         delete @workers[n]
         # TODO not sure what is this for. to be remove
@@ -60,32 +68,47 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
         @prepare-proxy.reject it
         delete @workers[n]
         throw it
-  purge: (n) -> if n? => delete @covers[n] else @covers = {}
-  lock: (n, p) ->
-    @prepare(n)
+  purge: (o) ->
+    n = @_id o
+    if n? => delete @covers[n] else @covers = {}
+  lock: (o, p) ->
+    n = @_id o
+    @prepare(o)
       .then ~> @covers[n].lock!
       .then ~> @covers[n].toggle true
       .catch ~> @error(n,it)
-  toggle: (n, v, p) ->
-    @prepare(n)
+  toggle: (o, v, p) ->
+    n = @_id o
+    @prepare(o)
       .then ~> @covers[n].toggle v
       .then ~> @fire "#{if @covers[n].is-on! => \on else \off}", {node: @covers[n], param: p, name: n}
       .catch ~> @error(n,it)
 
-  getcover: (n) -> @prepare n .then ~> @covers[n]
-  getdom: (n) -> @prepare n .then ~> @covers[n].root!
-  is-on: (n) -> @covers[n] and @covers[n].is-on!
-  set: (n, p) -> @prepare(n).then ~> @covers[n].set p
-  get: (n, p) ->
-    @prepare(n)
+  getcover: (o) ->
+    n = @_id o
+    @prepare o .then ~> @covers[n]
+  getdom: (o) ->
+    n = @_id o
+    @prepare o .then ~> @covers[n].root!
+  is-on: (o) ->
+    n = @_id o
+    @covers[n] and @covers[n].is-on!
+  set: (o, p) ->
+    n = @_id o
+    @prepare(o).then ~> @covers[n].set p
+  get: (o, p) ->
+    n = @_id o
+    @prepare(o)
       .then ~> @fire "on", {node: @covers[n], param: p, name: n}
       .then ~> @covers[n].get!
       .catch ~> @error(n,it)
   init: ->
+    # TODO we may limit lookup ranges under a certain DOM to optimize this.
     ld$.find('.ldcvmgr').map (n) ~>
       # only keep the first, named ldcvmgr.
       if !(id = n.getAttribute(\data-name)) or @covers[id] => return
       @covers[id] = new ldcover({root: n, lock: n.getAttribute(\data-lock) == \true})
+    # TODO we can watch click event over body to prevent a exhaust search about this.
     ld$.find('[data-ldcv-toggle]').map (n) ~>
       if !(id = n.getAttribute(\data-ldcv-toggle)) => return
       n.addEventListener \click, ~> @toggle id

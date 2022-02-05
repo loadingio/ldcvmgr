@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.5
+
+ - support `@plotdb/block` as ldcover
+
+
 ## v0.0.4
 
  - update window object only if module is not defined

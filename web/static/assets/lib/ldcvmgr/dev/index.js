@@ -15,6 +15,7 @@ ldcvmgr = function(opt){
       className: "ldld full",
       autoZ: true
     });
+  this.mgr = opt.manager || null;
   this.covers = {};
   this.workers = {};
   this.errorHandling = false;
@@ -51,8 +52,16 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     }
     return console.log(e.message || e);
   },
-  prepare: function(n){
-    var p, that, name, this$ = this;
+  _id: function(o){
+    if (typeof o === 'object') {
+      return this.mgr.id(o);
+    } else {
+      return o;
+    }
+  },
+  prepare: function(o){
+    var n, p, that, name, this$ = this;
+    n = this._id(o);
     if (this.covers[n]) {
       return Promise.resolve();
     }
@@ -65,42 +74,56 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     } else {
       this.loader.on(1000);
     }
-    p = (that = document.querySelector(".ldcvmgr[data-name=" + n + "]"))
-      ? Promise.resolve(that)
-      : (name = typeof this.path === 'function'
-        ? this.path(n)
-        : this.path + "/" + n + ".html", this.workers[n] = fetch(name).then(function(v){
-        if (!(v && v.ok)) {
-          throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
-        }
-        return v.text();
-      }).then(function(it){
-        var div, root;
-        document.body.appendChild(div = ld$.create({
-          name: 'div'
-        }));
-        div.innerHTML = it;
-        ld$.find(div, 'script').map(function(it){
-          var script;
-          script = ld$.create({
-            name: 'script',
-            attr: {
-              type: 'text/javascript'
-            }
-          });
-          script.text = it.textContent;
-          return it.parentNode.replaceChild(script, it);
+    p = typeof o === 'object'
+      ? this.workers[n] = this.mgr.get(o).then(function(bc){
+        return bc.create();
+      }).then(function(bi){
+        return bi.attach({
+          root: document.body
+        }).then(function(){
+          var ret;
+          this$.covers[n] = ret = bi['interface']();
+          return console.log(ret);
         });
-        return root = div.querySelector('.ldcv');
-      }));
+      })
+      : (that = document.querySelector(".ldcvmgr[data-name=" + n + "]"))
+        ? Promise.resolve(that)
+        : (name = typeof this.path === 'function'
+          ? this.path(n)
+          : this.path + "/" + n + ".html", this.workers[n] = fetch(name).then(function(v){
+          if (!(v && v.ok)) {
+            throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
+          }
+          return v.text();
+        }).then(function(it){
+          var div, root;
+          document.body.appendChild(div = ld$.create({
+            name: 'div'
+          }));
+          div.innerHTML = it;
+          ld$.find(div, 'script').map(function(it){
+            var script;
+            script = ld$.create({
+              name: 'script',
+              attr: {
+                type: 'text/javascript'
+              }
+            });
+            script.text = it.textContent;
+            return it.parentNode.replaceChild(script, it);
+          });
+          return root = div.querySelector('.ldcv');
+        }));
     return p['finally'](function(){
       return this$.loader.cancel(false);
     }).then(function(root){
       var ref$, ref1$;
-      this$.covers[n] = new ldcover({
-        root: root,
-        lock: root.getAttribute('data-lock') === 'true'
-      });
+      if (!this$.covers[n]) {
+        this$.covers[n] = new ldcover({
+          root: root,
+          lock: root.getAttribute('data-lock') === 'true'
+        });
+      }
       this$.prepareProxy.resolve();
       return ref1$ = (ref$ = this$.workers)[n], delete ref$[n], ref1$;
     })['catch'](function(it){
@@ -109,17 +132,19 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       throw it;
     });
   },
-  purge: function(n){
-    var ref$, ref1$;
+  purge: function(o){
+    var n, ref$, ref1$;
+    n = this._id(o);
     if (n != null) {
       return ref1$ = (ref$ = this.covers)[n], delete ref$[n], ref1$;
     } else {
       return this.covers = {};
     }
   },
-  lock: function(n, p){
-    var this$ = this;
-    return this.prepare(n).then(function(){
+  lock: function(o, p){
+    var n, this$ = this;
+    n = this._id(o);
+    return this.prepare(o).then(function(){
       return this$.covers[n].lock();
     }).then(function(){
       return this$.covers[n].toggle(true);
@@ -127,9 +152,10 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       return this$.error(n, it);
     });
   },
-  toggle: function(n, v, p){
-    var this$ = this;
-    return this.prepare(n).then(function(){
+  toggle: function(o, v, p){
+    var n, this$ = this;
+    n = this._id(o);
+    return this.prepare(o).then(function(){
       return this$.covers[n].toggle(v);
     }).then(function(){
       return this$.fire((this$.covers[n].isOn() ? 'on' : 'off') + "", {
@@ -141,30 +167,36 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       return this$.error(n, it);
     });
   },
-  getcover: function(n){
-    var this$ = this;
-    return this.prepare(n).then(function(){
+  getcover: function(o){
+    var n, this$ = this;
+    n = this._id(o);
+    return this.prepare(o).then(function(){
       return this$.covers[n];
     });
   },
-  getdom: function(n){
-    var this$ = this;
-    return this.prepare(n).then(function(){
+  getdom: function(o){
+    var n, this$ = this;
+    n = this._id(o);
+    return this.prepare(o).then(function(){
       return this$.covers[n].root();
     });
   },
-  isOn: function(n){
+  isOn: function(o){
+    var n;
+    n = this._id(o);
     return this.covers[n] && this.covers[n].isOn();
   },
-  set: function(n, p){
-    var this$ = this;
-    return this.prepare(n).then(function(){
+  set: function(o, p){
+    var n, this$ = this;
+    n = this._id(o);
+    return this.prepare(o).then(function(){
       return this$.covers[n].set(p);
     });
   },
-  get: function(n, p){
-    var this$ = this;
-    return this.prepare(n).then(function(){
+  get: function(o, p){
+    var n, this$ = this;
+    n = this._id(o);
+    return this.prepare(o).then(function(){
       return this$.fire("on", {
         node: this$.covers[n],
         param: p,
