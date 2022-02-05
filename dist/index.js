@@ -20,7 +20,9 @@ ldcvmgr = function(opt){
   this.workers = {};
   this.errorHandling = false;
   this.prepareProxy = proxise(function(n){});
-  this.init();
+  if (opt.autoInit) {
+    this.init();
+  }
   return this;
 };
 ldcvmgr.prototype = import$(Object.create(Object.prototype), {
@@ -208,9 +210,9 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       return this$.error(n, it);
     });
   },
-  init: function(){
+  init: function(root){
     var this$ = this;
-    ld$.find('.ldcvmgr').map(function(n){
+    ld$.find(root || document.body, '.ldcvmgr').map(function(n){
       var id;
       if (!(id = n.getAttribute('data-name')) || this$.covers[id]) {
         return;
@@ -220,14 +222,15 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
         lock: n.getAttribute('data-lock') === 'true'
       });
     });
-    return ld$.find('[data-ldcv-toggle]').map(function(n){
-      var id;
-      if (!(id = n.getAttribute('data-ldcv-toggle'))) {
+    return document.body.addEventListener('click', function(evt){
+      var n, id;
+      if (!(n = ld$.parent(evt.target, "[data-ldcvmgr-toggle]"))) {
         return;
       }
-      return n.addEventListener('click', function(){
-        return this$.toggle(id);
-      });
+      if (!(id = n.getAttribute('data-ldcvmgr-toggle'))) {
+        return;
+      }
+      return this$.toggle(/:/.exec(id) ? this$.mgr.id2obj(id) : id);
     });
   }
 });

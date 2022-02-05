@@ -1,5 +1,13 @@
 # Change Logs
 
+## v0.0.6
+
+ - optimize initialization by
+   - limit init scope for dom initialization
+   - track ldcvmgr toggling by listening to click event at document.body
+   - auto-init default off
+
+
 ## v0.0.5
 
  - support `@plotdb/block` as ldcover

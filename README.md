@@ -22,7 +22,8 @@ constructor options:
    - more information in the section below.
  - `loader`: ldLoader compatible object for loading indicator when ldcvmgr is fetching remote ldcover html files.
    - default to a fullscreen ldLoader spinner, with class `ldld full`.
- - `manager`: block manager. (TBA)
+ - `autoInit`: default false. `init` called automatically when set to true
+ - `manager`: block manager for loading `@/plotdb/block` style ldcover
 
 
 ## API
@@ -73,6 +74,14 @@ furthermore, you can also config your reverse proxy to lookup files ( nginx conf
     location /ldcv/(?<lc>.+)/(?<dep>.+)/(?<name>.+) {
       try_files /intl/$lc/ldcv/$dep/$name.html /intl/$lc/ldcv/generic/$name.html /ldcv/generic/$name.html =404;
     }
+
+
+## Toggling without scripting
+
+By `auto-init` and adding `data-ldcvmgr-toggle` attributes, you can toggle ldcover automatically when the node with required attribute clicked. Content of the attribute will be used to look up ldcover, which can be either:
+
+ - a string, doesn't contain `:` - will be treated as a plain ldcover name.
+ - a string, contains `:` - will be treated as an id of a block, and converted back to a block definition object.
 
 
 ## LICENSE

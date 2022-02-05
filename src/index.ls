@@ -9,7 +9,7 @@ ldcvmgr = (opt={}) ->
   @workers = {}
   @error-handling = false
   @prepare-proxy = proxise (n) ->
-  @init!
+  if opt.auto-init => @init!
   @
 
 ldcvmgr.prototype = Object.create(Object.prototype) <<< do
@@ -102,16 +102,15 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       .then ~> @fire "on", {node: @covers[n], param: p, name: n}
       .then ~> @covers[n].get!
       .catch ~> @error(n,it)
-  init: ->
-    # TODO we may limit lookup ranges under a certain DOM to optimize this.
-    ld$.find('.ldcvmgr').map (n) ~>
+  init: (root) ->
+    ld$.find(root or document.body, '.ldcvmgr').map (n) ~>
       # only keep the first, named ldcvmgr.
       if !(id = n.getAttribute(\data-name)) or @covers[id] => return
       @covers[id] = new ldcover({root: n, lock: n.getAttribute(\data-lock) == \true})
-    # TODO we can watch click event over body to prevent a exhaust search about this.
-    ld$.find('[data-ldcv-toggle]').map (n) ~>
-      if !(id = n.getAttribute(\data-ldcv-toggle)) => return
-      n.addEventListener \click, ~> @toggle id
+    document.body.addEventListener \click, (evt) ~>
+      if !(n = ld$.parent evt.target, "[data-ldcvmgr-toggle]") => return
+      if !(id = n.getAttribute \data-ldcvmgr-toggle) => return
+      @toggle(if /:/.exec(id) => @mgr.id2obj(id) else id)
 
 if module? => module.exports = ldcvmgr
 else if window? => window.ldcvmgr = ldcvmgr
