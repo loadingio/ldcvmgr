@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.7
+
+ - bug fix: get cover by blockdef doesn't work
+
+
 ## v0.0.6
 
  - optimize initialization by
