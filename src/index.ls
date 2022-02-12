@@ -39,7 +39,7 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
         .then (bc) -> bc.create!
         .then (bi) ~> bi.attach {root: document.body} .then ~>
           @covers[n] = ret = bi.interface!
-          console.log ret
+          bi.dom!
     else if document.querySelector(".ldcvmgr[data-name=#n]") => Promise.resolve(that)
     else
       name = if typeof(@path) == \function => @path(n) else "#{@path}/#n.html"

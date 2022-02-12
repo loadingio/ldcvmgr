@@ -85,7 +85,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
         }).then(function(){
           var ret;
           this$.covers[n] = ret = bi['interface']();
-          return console.log(ret);
+          return bi.dom();
         });
       })
       : (that = document.querySelector(".ldcvmgr[data-name=" + n + "]"))
