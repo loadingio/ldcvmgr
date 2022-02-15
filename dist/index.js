@@ -88,7 +88,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
           return bi.dom();
         });
       })
-      : (that = document.querySelector(".ldcvmgr[data-name=" + n + "]"))
+      : (that = document.querySelector(".ldcvmgr[data-name='" + n + "']"))
         ? Promise.resolve(that)
         : (name = typeof this.path === 'function'
           ? this.path(n)

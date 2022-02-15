@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.8
+
+ - bug fix: attribute selector need quote to prevent selector parsing error
+
+
 ## v0.0.7
 
  - bug fix: get cover by blockdef doesn't work
