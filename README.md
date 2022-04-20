@@ -30,6 +30,7 @@ constructor options:
 
  - `get(name, param)`: popup a ldcover `name`, and expect return value from it.
    - when `name` is a string, look up a ldcover named `name` in local cache or in "#{@path}/#name"
+     - will also lookup up in local DOM for name in this selector: `.ldcvmgr[data-name]`
    - when `name` is an object, load it by `@plotdb/block` manager.
      - interface of the loaded block should be a `ldcover` object.
    - when `param` is provided, it will be sent to `on` event as params.
