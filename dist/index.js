@@ -158,7 +158,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     var n, this$ = this;
     n = this._id(o);
     return this.prepare(o).then(function(){
-      return this$.covers[n].toggle(v);
+      return this$.covers[n].toggle(v, p);
     }).then(function(){
       return this$.fire((this$.covers[n].isOn() ? 'on' : 'off') + "", {
         node: this$.covers[n],
@@ -199,13 +199,12 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     var n, this$ = this;
     n = this._id(o);
     return this.prepare(o).then(function(){
-      return this$.fire("on", {
+      this$.fire("on", {
         node: this$.covers[n],
         param: p,
         name: n
       });
-    }).then(function(){
-      return this$.covers[n].get();
+      return this$.covers[n].get(p);
     })['catch'](function(it){
       return this$.error(n, it);
     });

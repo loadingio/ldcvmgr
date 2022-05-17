@@ -80,7 +80,7 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   toggle: (o, v, p) ->
     n = @_id o
     @prepare(o)
-      .then ~> @covers[n].toggle v
+      .then ~> @covers[n].toggle v, p
       .then ~> @fire "#{if @covers[n].is-on! => \on else \off}", {node: @covers[n], param: p, name: n}
       .catch ~> @error(n,it)
 
@@ -99,8 +99,9 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   get: (o, p) ->
     n = @_id o
     @prepare(o)
-      .then ~> @fire "on", {node: @covers[n], param: p, name: n}
-      .then ~> @covers[n].get!
+      .then ~>
+        @fire "on", {node: @covers[n], param: p, name: n}
+        @covers[n].get p
       .catch ~> @error(n,it)
   init: (root) ->
     ld$.find(root or document.body, '.ldcvmgr').map (n) ~>

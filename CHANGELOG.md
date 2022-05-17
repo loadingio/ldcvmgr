@@ -1,5 +1,11 @@
 # Change Logs
 
+## v0.0.9
+
+ - parameter passed to ldcv in `get` and `toggle` function
+ - `get` right after `on` event is fired in case of unexpected promise in event handler
+
+
 ## v0.0.8
 
  - bug fix: attribute selector need quote to prevent selector parsing error
