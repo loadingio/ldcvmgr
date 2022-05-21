@@ -1,5 +1,11 @@
 # Change Logs
 
+## v0.0.10
+
+ - support `error-cover` for customization of default error cover.
+ - pass parameter to error handler as the third parameter for providing more detail error message
+
+
 ## v0.0.9
 
  - parameter passed to ldcv in `get` and `toggle` function

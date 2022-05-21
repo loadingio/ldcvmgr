@@ -24,6 +24,7 @@ constructor options:
    - default to a fullscreen ldLoader spinner, with class `ldld full`.
  - `autoInit`: default false. `init` called automatically when set to true
  - `manager`: block manager for loading `@/plotdb/block` style ldcover
+ - `errorCover`: customized cover for error handler. can either be a string or a `@plotdb/block` definition object.
 
 
 ## API

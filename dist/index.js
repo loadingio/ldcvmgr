@@ -18,6 +18,7 @@ ldcvmgr = function(opt){
   this.mgr = opt.manager || null;
   this.covers = {};
   this.workers = {};
+  this.errorCover = opt.errorCover || 'error';
   this.errorHandling = false;
   this.prepareProxy = proxise(function(n){});
   if (opt.autoInit) {
@@ -43,14 +44,18 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     }
     return results$;
   },
-  error: function(n, e){
+  error: function(n, e, p){
     n == null && (n = '');
     e == null && (e = {});
-    if (n === 'error') {
+    p == null && (p = {});
+    if (n === 'error' || n === this.errorCover) {
       alert("something is wrong; please reload and try again");
     } else {
       this.errorHandling = true;
-      this.toggle('error');
+      this.toggle(this.errorCover || 'error', true, {
+        err: e,
+        param: p
+      });
     }
     return console.log(e.message || e);
   },
@@ -150,8 +155,8 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       return this$.covers[n].lock();
     }).then(function(){
       return this$.covers[n].toggle(true);
-    })['catch'](function(it){
-      return this$.error(n, it);
+    })['catch'](function(e){
+      return this$.error(n, e, p);
     });
   },
   toggle: function(o, v, p){
@@ -165,8 +170,8 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
         param: p,
         name: n
       });
-    })['catch'](function(it){
-      return this$.error(n, it);
+    })['catch'](function(e){
+      return this$.error(n, e, p);
     });
   },
   getcover: function(o){
@@ -205,8 +210,8 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
         name: n
       });
       return this$.covers[n].get(p);
-    })['catch'](function(it){
-      return this$.error(n, it);
+    })['catch'](function(e){
+      return this$.error(n, e, p);
     });
   },
   init: function(root){

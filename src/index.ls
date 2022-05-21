@@ -7,6 +7,7 @@ ldcvmgr = (opt={}) ->
   @mgr = opt.manager or null
   @covers = {}
   @workers = {}
+  @error-cover = opt.error-cover or \error
   @error-handling = false
   @prepare-proxy = proxise (n) ->
   if opt.auto-init => @init!
@@ -15,12 +16,12 @@ ldcvmgr = (opt={}) ->
 ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   on: (n, cb) -> @evt-handler.[][n].push cb
   fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
-  error: (n = '', e = {}) ->
-    if n == \error => alert "something is wrong; please reload and try again"
+  error: (n = '', e = {}, p = {}) ->
+    if n == \error or n == @error-cover => alert "something is wrong; please reload and try again"
     else
       # toggle this so we know that we are handling internal error.
       @error-handling = true
-      @toggle \error
+      @toggle (@error-cover or \error), true, {err: e, param: p}
     console.log(e.message or e)
   _id: (o) -> if typeof(o) == \object => @mgr.id(o) else o
   prepare: (o) ->
@@ -76,13 +77,13 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     @prepare(o)
       .then ~> @covers[n].lock!
       .then ~> @covers[n].toggle true
-      .catch ~> @error(n,it)
+      .catch (e) ~> @error(n,e,p)
   toggle: (o, v, p) ->
     n = @_id o
     @prepare(o)
       .then ~> @covers[n].toggle v, p
       .then ~> @fire "#{if @covers[n].is-on! => \on else \off}", {node: @covers[n], param: p, name: n}
-      .catch ~> @error(n,it)
+      .catch (e)~> @error(n,e,p)
 
   getcover: (o) ->
     n = @_id o
@@ -102,7 +103,7 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       .then ~>
         @fire "on", {node: @covers[n], param: p, name: n}
         @covers[n].get p
-      .catch ~> @error(n,it)
+      .catch (e) ~> @error(n,e,p)
   init: (root) ->
     ld$.find(root or document.body, '.ldcvmgr').map (n) ~>
       # only keep the first, named ldcvmgr.
