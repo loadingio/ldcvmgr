@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.11
+
+ - bug fix: parameter no passed in `lock`
+
+
 ## v0.0.10
 
  - support `error-cover` for customization of default error cover.

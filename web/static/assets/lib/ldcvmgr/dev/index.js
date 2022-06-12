@@ -154,7 +154,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     return this.prepare(o).then(function(){
       return this$.covers[n].lock();
     }).then(function(){
-      return this$.covers[n].toggle(true);
+      return this$.covers[n].toggle(true, p);
     })['catch'](function(e){
       return this$.error(n, e, p);
     });
