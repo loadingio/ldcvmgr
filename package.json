@@ -2,8 +2,8 @@
   "author": "zbryikt",
   "name": "ldcvmgr",
   "license": "MIT",
-  "description": "ldCover Manager",
-  "version": "0.0.11",
+  "description": "ldcover Manager",
+  "version": "0.0.12",
   "browser": "dist/index.min.js",
   "main": "dist/index.min.js",
   "files": [

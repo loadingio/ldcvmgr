@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.12
+
+ - bug fix: should check recurring `error-cover` with `_id`
+
+
 ## v0.0.11
 
  - bug fix: parameter no passed in `lock`

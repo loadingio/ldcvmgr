@@ -17,7 +17,8 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   on: (n, cb) -> @evt-handler.[][n].push cb
   fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
   error: (n = '', e = {}, p = {}) ->
-    if n == \error or n == @error-cover => alert "something is wrong; please reload and try again"
+    if n == \error or n == @error-cover or n == @_id(@error-cover) =>
+      alert "something is wrong; please reload and try again"
     else
       # toggle this so we know that we are handling internal error.
       @error-handling = true

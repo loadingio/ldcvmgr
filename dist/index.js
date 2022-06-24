@@ -48,7 +48,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     n == null && (n = '');
     e == null && (e = {});
     p == null && (p = {});
-    if (n === 'error' || n === this.errorCover) {
+    if (n === 'error' || n === this.errorCover || n === this._id(this.errorCover)) {
       alert("something is wrong; please reload and try again");
     } else {
       this.errorHandling = true;
