@@ -21,6 +21,10 @@ ldcvmgr = function(opt){
   this.errorCover = opt.errorCover || 'error';
   this.errorHandling = false;
   this.prepareProxy = proxise(function(n){});
+  if (opt.zmgr) {
+    this.zmgr(opt.zmgr);
+  }
+  this.baseZ = opt.baseZ || (opt.zmgr ? 'modal' : 3000);
   if (opt.autoInit) {
     this.init();
   }
@@ -43,6 +47,13 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       results$.push(cb.apply(this, v));
     }
     return results$;
+  },
+  zmgr: function(it){
+    if (it != null) {
+      return this._zmgr = it;
+    } else {
+      return this._zmgr;
+    }
   },
   error: function(n, e, p){
     n == null && (n = '');
@@ -86,7 +97,11 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
         return bc.create();
       }).then(function(bi){
         return bi.attach({
-          root: document.body
+          root: document.body,
+          data: {
+            zmgr: this$._zmgr,
+            baseZ: this$.baseZ
+          }
         }).then(function(){
           var ret;
           this$.covers[n] = ret = bi['interface']();
@@ -126,9 +141,12 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     }).then(function(root){
       var ref$, ref1$;
       if (!this$.covers[n]) {
+        console.log("~>", this$.baseZ);
         this$.covers[n] = new ldcover({
           root: root,
-          lock: root.getAttribute('data-lock') === 'true'
+          lock: root.getAttribute('data-lock') === 'true',
+          zmgr: this$._zmgr,
+          baseZ: this$.baseZ
         });
       }
       this$.prepareProxy.resolve();
@@ -221,9 +239,12 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       if (!(id = n.getAttribute('data-name')) || this$.covers[id]) {
         return;
       }
+      console.log("~>", this$.baseZ);
       return this$.covers[id] = new ldcover({
         root: n,
-        lock: n.getAttribute('data-lock') === 'true'
+        lock: n.getAttribute('data-lock') === 'true',
+        zmgr: this$._zmgr,
+        baseZ: this$.baseZ
       });
     });
     return document.body.addEventListener('click', function(evt){

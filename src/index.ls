@@ -10,12 +10,15 @@ ldcvmgr = (opt={}) ->
   @error-cover = opt.error-cover or \error
   @error-handling = false
   @prepare-proxy = proxise (n) ->
+  if opt.zmgr => @zmgr opt.zmgr
+  @base-z = opt.base-z or if opt.zmgr => \modal else 3000
   if opt.auto-init => @init!
   @
 
 ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   on: (n, cb) -> @evt-handler.[][n].push cb
   fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
+  zmgr: -> if it? => @_zmgr = it else @_zmgr
   error: (n = '', e = {}, p = {}) ->
     if n == \error or n == @error-cover or n == @_id(@error-cover) =>
       alert "something is wrong; please reload and try again"
@@ -39,7 +42,7 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     p = if typeof(o) == \object =>
       @workers[n] = @mgr.get o
         .then (bc) -> bc.create!
-        .then (bi) ~> bi.attach {root: document.body} .then ~>
+        .then (bi) ~> bi.attach {root: document.body, data: {zmgr: @_zmgr, base-z: @base-z}} .then ~>
           @covers[n] = ret = bi.interface!
           bi.dom!
     else if document.querySelector(".ldcvmgr[data-name='#n']") => Promise.resolve(that)
@@ -61,7 +64,14 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       .finally ~>
         @loader.cancel false
       .then (root) ~>
-        if !@covers[n] => @covers[n] = new ldcover root: root, lock: root.getAttribute(\data-lock) == \true
+        if !@covers[n] =>
+          console.log "~>", @base-z
+          @covers[n] = new ldcover({
+            root: root
+            lock: root.getAttribute(\data-lock) == \true
+            zmgr: @_zmgr
+            base-z: @base-z
+          })
         @prepare-proxy.resolve!
         delete @workers[n]
         # TODO not sure what is this for. to be remove
@@ -109,7 +119,13 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     ld$.find(root or document.body, '.ldcvmgr').map (n) ~>
       # only keep the first, named ldcvmgr.
       if !(id = n.getAttribute(\data-name)) or @covers[id] => return
-      @covers[id] = new ldcover({root: n, lock: n.getAttribute(\data-lock) == \true})
+      console.log "~>", @base-z
+      @covers[id] = new ldcover({
+        root: n
+        lock: n.getAttribute(\data-lock) == \true
+        zmgr: @_zmgr
+        base-z: @base-z
+      })
     document.body.addEventListener \click, (evt) ~>
       if !(n = ld$.parent evt.target, "[data-ldcvmgr-toggle]") => return
       if !(id = n.getAttribute \data-ldcvmgr-toggle) => return
