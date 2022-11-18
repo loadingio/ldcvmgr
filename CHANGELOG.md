@@ -1,5 +1,11 @@
 # Change Logs
 
+## v0.0.13
+
+ - support `zmgr`, `baseZ` option.
+ - pass `zmgr` and `baseZ` option to block as data fields for blocks which construct ldcover by themselves.
+
+
 ## v0.0.12
 
  - bug fix: should check recurring `error-cover` with `_id`

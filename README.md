@@ -25,6 +25,8 @@ constructor options:
  - `autoInit`: default false. `init` called automatically when set to true
  - `manager`: block manager for loading `@/plotdb/block` style ldcover
  - `errorCover`: customized cover for error handler. can either be a string or a `@plotdb/block` definition object.
+ - `baseZ`: `baseZ` for `ldcover`. if omitted, will be `modal` if `zmgr` is provided; otherwise will be `3000`.
+ - `zmgr`: optional. `zmgr` for `ldcover`. see the `zmgr` package for more information.
 
 
 ## API
@@ -34,6 +36,7 @@ constructor options:
      - will also lookup up in local DOM for name in this selector: `.ldcvmgr[data-name]`
    - when `name` is an object, load it by `@plotdb/block` manager.
      - interface of the loaded block should be a `ldcover` object.
+     - when available, `{zmgr, baseZ}` will be passed as block data, which should be used to maintain z-index.
    - when `param` is provided, it will be sent to `on` event as params.
  - `set(name, param)`: resolve popped ldcover `name` with `param`
  - `on(name, callback({...}))`: listen to `name` event. Following events are available:
