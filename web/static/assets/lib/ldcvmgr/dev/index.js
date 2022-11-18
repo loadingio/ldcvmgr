@@ -141,7 +141,6 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     }).then(function(root){
       var ref$, ref1$;
       if (!this$.covers[n]) {
-        console.log("~>", this$.baseZ);
         this$.covers[n] = new ldcover({
           root: root,
           lock: root.getAttribute('data-lock') === 'true',
@@ -239,7 +238,6 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       if (!(id = n.getAttribute('data-name')) || this$.covers[id]) {
         return;
       }
-      console.log("~>", this$.baseZ);
       return this$.covers[id] = new ldcover({
         root: n,
         lock: n.getAttribute('data-lock') === 'true',

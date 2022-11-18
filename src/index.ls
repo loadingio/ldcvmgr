@@ -65,7 +65,6 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
         @loader.cancel false
       .then (root) ~>
         if !@covers[n] =>
-          console.log "~>", @base-z
           @covers[n] = new ldcover({
             root: root
             lock: root.getAttribute(\data-lock) == \true
@@ -119,7 +118,6 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     ld$.find(root or document.body, '.ldcvmgr').map (n) ~>
       # only keep the first, named ldcvmgr.
       if !(id = n.getAttribute(\data-name)) or @covers[id] => return
-      console.log "~>", @base-z
       @covers[id] = new ldcover({
         root: n
         lock: n.getAttribute(\data-lock) == \true

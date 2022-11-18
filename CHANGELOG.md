@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.14
+
+ - remove unnecessary log
+
+
 ## v0.0.13
 
  - support `zmgr`, `baseZ` option.
