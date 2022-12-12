@@ -1,5 +1,11 @@
 # Change Logs
 
+## v0.0.15
+
+ - use @plotdb/block to load string name cover so we can also run scoped script inside
+ - npm audit fix for dependencies vulnerabilities fixing
+
+
 ## v0.0.14
 
  - remove unnecessary log
