@@ -117,24 +117,21 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
             throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
           }
           return v.text();
-        }).then(function(it){
-          var div, root;
-          document.body.appendChild(div = ld$.create({
-            name: 'div'
-          }));
-          div.innerHTML = it;
-          ld$.find(div, 'script').map(function(it){
-            var script;
-            script = ld$.create({
-              name: 'script',
-              attr: {
-                type: 'text/javascript'
-              }
-            });
-            script.text = it.textContent;
-            return it.parentNode.replaceChild(script, it);
+        }).then(function(code){
+          var bc;
+          bc = new block['class']({
+            manager: this$.mgr,
+            code: code
           });
-          return root = div.querySelector('.ldcv');
+          return bc.create({
+            root: document.body
+          }).then(function(bi){
+            var itf;
+            if (itf = bi['interface']()) {
+              this.covers[n] = itf;
+            }
+            return bi.dom();
+          });
         }));
     return p['finally'](function(){
       return this$.loader.cancel(false);

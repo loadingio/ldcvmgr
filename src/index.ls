@@ -52,14 +52,12 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
         .then (v) ~>
           if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
           v.text!
-        .then ~>
-          document.body.appendChild (div = ld$.create name: \div)
-          div.innerHTML = it
-          ld$.find(div,\script).map ->
-            script = ld$.create name: \script, attr: type: \text/javascript
-            script.text = it.textContent
-            it.parentNode.replaceChild script, it
-          root = div.querySelector('.ldcv')
+        .then (code) ~>
+          bc = new block.class {manager: @mgr, code}
+          bc.create {root: document.body}
+            .then (bi) ->
+              if itf = bi.interface! => @covers[n] = itf
+              bi.dom!
     p
       .finally ~>
         @loader.cancel false
