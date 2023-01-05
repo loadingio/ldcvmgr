@@ -3,7 +3,7 @@
   "name": "ldcvmgr",
   "license": "MIT",
   "description": "ldcover Manager",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "browser": "dist/index.min.js",
   "main": "dist/index.min.js",
   "files": [
