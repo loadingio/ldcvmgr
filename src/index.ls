@@ -11,6 +11,20 @@ ldcvmgr = (opt={}) ->
   @error-handling = false
   @prepare-proxy = proxise (n) ->
   if opt.zmgr => @zmgr opt.zmgr
+  /*
+  originally we use `modal` for base-z if zmgr is provided.
+  this scope the zmgr into `modal`, which may have issues if we want to
+  manage z-index along with loaders or other elements.
+  additionally, user will have to remember to config their manually
+  created ldcover with `modal` `base-z`, otherwise the z-index won't
+  align.
+
+  this really causes some issue so instead of hard code a default `modal`,
+  we use 3000 as default value for user to overwrite.
+
+  there may stlil be issues if we change ldcover's default base-z,
+  which is unlikely to happen anyway.
+  */
   @base-z = opt.base-z or 3000
   if opt.auto-init => @init!
   @
