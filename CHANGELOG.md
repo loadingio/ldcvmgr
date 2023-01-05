@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.16
+
+ - set default `base-z` to `3000`.
+
+
 ## v0.0.15
 
  - use @plotdb/block to load string name cover so we can also run scoped script inside

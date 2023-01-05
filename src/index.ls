@@ -11,7 +11,7 @@ ldcvmgr = (opt={}) ->
   @error-handling = false
   @prepare-proxy = proxise (n) ->
   if opt.zmgr => @zmgr opt.zmgr
-  @base-z = opt.base-z or if opt.zmgr => \modal else 3000
+  @base-z = opt.base-z or 3000
   if opt.auto-init => @init!
   @
 

@@ -24,7 +24,7 @@ ldcvmgr = function(opt){
   if (opt.zmgr) {
     this.zmgr(opt.zmgr);
   }
-  this.baseZ = opt.baseZ || (opt.zmgr ? 'modal' : 3000);
+  this.baseZ = opt.baseZ || 3000;
   if (opt.autoInit) {
     this.init();
   }
