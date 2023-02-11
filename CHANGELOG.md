@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.17
+
+ - support block i18n based on `languageChanged` event.
+
+
 ## v0.0.16
 
  - set default `base-z` to `3000`.

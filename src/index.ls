@@ -5,6 +5,8 @@ ldcvmgr = (opt={}) ->
   if typeof(@path) == \string => @path = @path.replace(/\/$/,'')
   @loader = if opt.loader => that else new ldloader className: "ldld full", auto-z: true
   @mgr = opt.manager or null
+  # keeping all block instances here so we can do i18n transform if needed.
+  @blocks = {}
   @covers = {}
   @workers = {}
   @error-cover = opt.error-cover or \error
@@ -27,6 +29,12 @@ ldcvmgr = (opt={}) ->
   */
   @base-z = opt.base-z or 3000
   if opt.auto-init => @init!
+  if block.i18n.module =>
+    # while we have autoTransform option in block, we actually don't attach all block instance
+    # so we still transform by ourselves here.
+    <~ block.i18n.module.on \languageChanged, _
+    for k,v of @blocks => v.transform \i18n
+
   @
 
 ldcvmgr.prototype = Object.create(Object.prototype) <<< do
@@ -56,9 +64,17 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     p = if typeof(o) == \object =>
       @workers[n] = @mgr.get o
         .then (bc) -> bc.create!
-        .then (bi) ~> bi.attach {root: document.body, data: {zmgr: @_zmgr, base-z: @base-z}} .then ~>
-          @covers[n] = ret = bi.interface!
-          bi.dom!
+        .then (bi) ~>
+          bi.attach {
+            root: document.body
+            # we will do i18n ourselves until we make sure it's okay to delegate to block
+            # this may need some update in below bc.create related code.
+            auto-transform: null
+            data: {zmgr: @_zmgr, base-z: @base-z}
+          } .then ~>
+            @blocks[n] = bi
+            @covers[n] = ret = bi.interface!
+            bi.dom!
     else if document.querySelector(".ldcvmgr[data-name='#n']") => Promise.resolve(that)
     else
       name = if typeof(@path) == \function => @path(n) else "#{@path}/#n.html"
@@ -69,7 +85,8 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
         .then (code) ~>
           bc = new block.class {manager: @mgr, code}
           bc.create {root: document.body}
-            .then (bi) ->
+            .then (bi) ~>
+              @blocks[n] = bi
               if itf = bi.interface! => @covers[n] = itf
               bi.dom!
     p
