@@ -42,13 +42,19 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
   zmgr: -> if it? => @_zmgr = it else @_zmgr
   error: (n = '', e = {}, p = {}) ->
+    console.error e
     if n == \error or n == @error-cover or n == @_id(@error-cover) =>
       alert "something is wrong; please reload and try again"
+      # we are here because error handler can't properly handler errors.
+      # so we return a never-resolved Promise to stop any possible further exceptions
+      return new Promise (res, rej) ->
     else
-      # toggle this so we know that we are handling internal error.
+      # identifying we are handling internal error.
       @error-handling = true
+      # hint user about ldcvmgr internal error
       @toggle (@error-cover or \error), true, {err: e, param: p}
-    console.log(e.message or e)
+      # let caller handler this error
+      throw e
   _id: (o) -> if typeof(o) == \object => @mgr.id(o) else o
   prepare: (o) ->
     n = @_id o
@@ -80,8 +86,8 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       name = if typeof(@path) == \function => @path(n) else "#{@path}/#n.html"
       @workers[n] = fetch name
         .then (v) ~>
-          if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
-          v.text!
+          if v and v.ok => return v.text!
+          return Promise.reject(new Error("[ldcvmgr] cover '#{if !n => '<no-name>' else n}' load failed."))
         .then (code) ~>
           bc = new block.class {manager: @mgr, code}
           bc.create {root: document.body}
@@ -113,7 +119,9 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     if n? => delete @covers[n] else @covers = {}
   lock: (o, p) ->
     n = @_id o
-    @prepare(o)
+
+    #@prepare(o)
+    Promise.reject new Error!
       .then ~> @covers[n].lock!
       .then ~> @covers[n].toggle true, p
       .catch (e) ~> @error(n,e,p)

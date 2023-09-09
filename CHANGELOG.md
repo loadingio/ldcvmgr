@@ -1,5 +1,12 @@
 # Change Logs
 
+## v0.0.18 (upcoming)
+
+ - show error by console.error instead log. also, show full error instead of message.
+ - return never-resolved Promise to stop further exceptions when error handling fails.
+ - still throw error when handling ldcvmgr internal error
+
+ 
 ## v0.0.17
 
  - support block i18n based on `languageChanged` event.

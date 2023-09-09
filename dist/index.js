@@ -84,16 +84,18 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     n == null && (n = '');
     e == null && (e = {});
     p == null && (p = {});
+    console.error(e);
     if (n === 'error' || n === this.errorCover || n === this._id(this.errorCover)) {
       alert("something is wrong; please reload and try again");
+      return new Promise(function(res, rej){});
     } else {
       this.errorHandling = true;
       this.toggle(this.errorCover || 'error', true, {
         err: e,
         param: p
       });
+      throw e;
     }
-    return console.log(e.message || e);
   },
   _id: function(o){
     if (typeof o === 'object') {
@@ -140,10 +142,10 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
         : (name = typeof this.path === 'function'
           ? this.path(n)
           : this.path + "/" + n + ".html", this.workers[n] = fetch(name).then(function(v){
-          if (!(v && v.ok)) {
-            throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
+          if (v && v.ok) {
+            return v.text();
           }
-          return v.text();
+          return Promise.reject(new Error("[ldcvmgr] cover '" + (!n ? '<no-name>' : n) + "' load failed."));
         }).then(function(code){
           var bc;
           bc = new block['class']({
@@ -193,7 +195,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
   lock: function(o, p){
     var n, this$ = this;
     n = this._id(o);
-    return this.prepare(o).then(function(){
+    return Promise.reject(new Error()).then(function(){
       return this$.covers[n].lock();
     }).then(function(){
       return this$.covers[n].toggle(true, p);
