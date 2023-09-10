@@ -1,6 +1,6 @@
 # Change Logs
 
-## v0.0.18 (upcoming)
+## v0.0.18
 
  - show error by console.error instead log. also, show full error instead of message.
  - return never-resolved Promise to stop further exceptions when error handling fails.
