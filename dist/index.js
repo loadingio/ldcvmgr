@@ -195,7 +195,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
   lock: function(o, p){
     var n, this$ = this;
     n = this._id(o);
-    return Promise.reject(new Error()).then(function(){
+    return this.prepare(o).then(function(){
       return this$.covers[n].lock();
     }).then(function(){
       return this$.covers[n].toggle(true, p);

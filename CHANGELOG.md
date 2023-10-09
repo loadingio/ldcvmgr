@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.19
+
+ - fix bug: `lock` always reject caused by dev code that were accentially left.
+
+
 ## v0.0.18
 
  - show error by console.error instead log. also, show full error instead of message.

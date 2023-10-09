@@ -119,9 +119,7 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     if n? => delete @covers[n] else @covers = {}
   lock: (o, p) ->
     n = @_id o
-
-    #@prepare(o)
-    Promise.reject new Error!
+    @prepare(o)
       .then ~> @covers[n].lock!
       .then ~> @covers[n].toggle true, p
       .catch (e) ~> @error(n,e,p)
