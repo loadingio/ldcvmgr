@@ -45,7 +45,7 @@ constructor options:
      - params: additional parameters provided when `get` is called.
      - name: toggled ldcover name
    - `off`: fired when some ldcover is toggled off. similar params with `on`.
- - `lock(name)`: popup a ldcover `name`, and user can't dismiss it.
+ - `lock(name)`: popup a ldcover `name` with `get`, and force lock to prevent dismissing.
  - `purge(name)`: clear cache for ldcover `name`.
  - `toggle(name,value,param)`: toggle ldcover `name` with state based on the value (true or false)
    - optional `param` passed to `on` event, just like `get`.

@@ -198,7 +198,12 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     return this.prepare(o).then(function(){
       return this$.covers[n].lock();
     }).then(function(){
-      return this$.covers[n].toggle(true, p);
+      this$.fire("on", {
+        node: this$.covers[n],
+        param: p,
+        name: n
+      });
+      return this$.covers[n].get(p);
     })['catch'](function(e){
       return this$.error(n, e, p);
     });

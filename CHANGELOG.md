@@ -1,5 +1,10 @@
 # Change Logs
 
+## v0.0.20
+
+ - use `get` instead of `toggle` in `lock` to get cover result value.
+
+
 ## v0.0.19
 
  - fix bug: `lock` always reject caused by dev code that were accentially left.

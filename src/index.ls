@@ -121,7 +121,9 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     n = @_id o
     @prepare(o)
       .then ~> @covers[n].lock!
-      .then ~> @covers[n].toggle true, p
+      .then ~>
+        @fire "on", {node: @covers[n], param: p, name: n}
+        @covers[n].get p
       .catch (e) ~> @error(n,e,p)
   toggle: (o, v, p) ->
     n = @_id o
