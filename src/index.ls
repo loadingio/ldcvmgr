@@ -42,6 +42,9 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
   fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
   zmgr: -> if it? => @_zmgr = it else @_zmgr
   error: (n = '', e = {}, p = {}) ->
+    # sometimes we use error like 999 (cancel) to skip,
+    # however all errors from cover managed by ldcvmgr go here.
+    # TODO we probably will want to make it configurable to skip certain errors.
     console.error e
     if n == \error or n == @error-cover or n == @_id(@error-cover) =>
       alert "something is wrong; please reload and try again"
