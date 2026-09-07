@@ -1,5 +1,12 @@
 # Change Logs
 
+## v0.0.21
+
+ - replace `alert` in error handler with a plain DOM fatal splash, which is built once and reused.
+   - re-attached if it's gone from document, so the hint never silently disappears.
+ - new options: `fatalMessage`, `fatalAction` and `fatal` for customizing the splash.
+
+
 ## v0.0.20
 
  - use `get` instead of `toggle` in `lock` to get cover result value.

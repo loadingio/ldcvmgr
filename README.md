@@ -27,6 +27,10 @@ constructor options:
  - `errorCover`: customized cover for error handler. can either be a string or a `@plotdb/block` definition object.
  - `baseZ`: `baseZ` for `ldcover`. if omitted, will be `modal` if `zmgr` is provided; otherwise will be `3000`.
  - `zmgr`: optional. `zmgr` for `ldcover`. see the `zmgr` package for more information.
+ - `fatalMessage`: message shown in the fatal splash. default `Something is wrong. Please reload and try again.`
+ - `fatalAction`: label of the reload button in the fatal splash. default `Reload`.
+ - `fatal`: optional function `(error)` to fully replace the default fatal splash.
+   - called at most once. see `fatal` in API section.
 
 
 ## API
@@ -52,6 +56,12 @@ constructor options:
  - `getcover(name)`: return `ldcover` instance of ldcover `name`.
  - `getdom(name)`: return DOM root of ldcover `name`.
  - `is-on(name)`: return true if ldcover `name` is on.
+ - `fatal(error)`: last resort handler, called when even the error cover fails.
+   - renders a dependency-free, plain DOM splash asking user to reload, or calls the `fatal` option if provided.
+   - the splash DOM is built once and reused, so repeated failures won't stack up splashes.
+     it is re-attached, however, if it's gone from the document for any reason.
+   - a custom `fatal` option, in contrast, is called at most once.
+   - always returns a never-resolved Promise, stopping any further chained handling.
 
 
 ## Customizing Path

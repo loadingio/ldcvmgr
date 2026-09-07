@@ -11,6 +11,8 @@ ldcvmgr = (opt={}) ->
   @workers = {}
   @error-cover = opt.error-cover or \error
   @error-handling = false
+  @_fatal = false
+  @_fatal-node = null
   @prepare-proxy = proxise (n) ->
   if opt.zmgr => @zmgr opt.zmgr
   /*
@@ -47,10 +49,10 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
     # TODO we probably will want to make it configurable to skip certain errors.
     console.error e
     if n == \error or n == @error-cover or n == @_id(@error-cover) =>
-      alert "something is wrong; please reload and try again"
       # we are here because error handler can't properly handler errors.
-      # so we return a never-resolved Promise to stop any possible further exceptions
-      return new Promise (res, rej) ->
+      # `fatal` shows a one-time splash, and returns a never-resolved Promise
+      # to stop any possible further exceptions
+      return @fatal e
     else
       # identifying we are handling internal error.
       @error-handling = true
@@ -58,6 +60,58 @@ ldcvmgr.prototype = Object.create(Object.prototype) <<< do
       @toggle (@error-cover or \error), true, {err: e, param: p}
       # let caller handler this error
       throw e
+  # last resort when even error cover fails. show a plain, dependency-free splash
+  # asking user to reload. the splash is built only once and reused, yet we still
+  # re-attach it if it's gone for any reason ( e.g. page code wiping out body ),
+  # so the hint never silently disappears.
+  # always returns a never-resolved Promise so callers stop right here.
+  fatal: (e) ->
+    ret = new Promise (res, rej) ->
+    if typeof(@opt.fatal) == \function =>
+      # custom handler is out of our control, so we only call it once.
+      if @_fatal => return ret
+      @_fatal = true
+      try
+        @opt.fatal.call @, e
+      catch e2
+        console.error e2
+      return ret
+    if @_fatal-node =>
+      # `contains` instead of `isConnected` for wider browser support.
+      # note that appendChild moves the node here if it's under some other node,
+      # so no need to detach it by ourselves.
+      if !document.body.contains(@_fatal-node) => document.body.appendChild @_fatal-node
+      return ret
+    node = document.createElement \div
+    node.className = \ldcvmgr-fatal
+    node.setAttribute \style, [
+      "position:fixed", "top:0", "left:0", "width:100%", "height:100%"
+      "z-index:2147483647", "display:flex", "align-items:center"
+      "justify-content:center", "background:rgba(0,0,0,0.5)"
+      "font-family:sans-serif", "color:#333"
+    ].join(';')
+    box = document.createElement \div
+    box.setAttribute \style, [
+      "max-width:20rem", "margin:1rem", "padding:1.5rem", "border-radius:0.5rem"
+      "background:white", "box-shadow:0 0.5rem 2rem rgba(0,0,0,0.3)", "text-align:center"
+    ].join(';')
+    msg = document.createElement \div
+    msg.setAttribute \style, "margin-bottom:1.5rem;line-height:1.5"
+    msg.textContent = @opt.fatal-message or "Something is wrong. Please reload and try again."
+    btn = document.createElement \button
+    btn.setAttribute \type, \button
+    btn.setAttribute \style, [
+      "padding:0.5rem 1.5rem", "border:none", "border-radius:0.25rem"
+      "background:#333", "color:white", "cursor:pointer", "font-size:1rem"
+    ].join(';')
+    btn.textContent = @opt.fatal-action or "Reload"
+    btn.addEventListener \click, -> location.reload!
+    box.appendChild msg
+    box.appendChild btn
+    node.appendChild box
+    @_fatal-node = node
+    document.body.appendChild node
+    ret
   _id: (o) -> if typeof(o) == \object => @mgr.id(o) else o
   prepare: (o) ->
     n = @_id o

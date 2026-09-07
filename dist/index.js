@@ -21,6 +21,8 @@ ldcvmgr = function(opt){
   this.workers = {};
   this.errorCover = opt.errorCover || 'error';
   this.errorHandling = false;
+  this._fatal = false;
+  this._fatalNode = null;
   this.prepareProxy = proxise(function(n){});
   if (opt.zmgr) {
     this.zmgr(opt.zmgr);
@@ -86,8 +88,7 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
     p == null && (p = {});
     console.error(e);
     if (n === 'error' || n === this.errorCover || n === this._id(this.errorCover)) {
-      alert("something is wrong; please reload and try again");
-      return new Promise(function(res, rej){});
+      return this.fatal(e);
     } else {
       this.errorHandling = true;
       this.toggle(this.errorCover || 'error', true, {
@@ -96,6 +97,50 @@ ldcvmgr.prototype = import$(Object.create(Object.prototype), {
       });
       throw e;
     }
+  },
+  fatal: function(e){
+    var ret, e2, node, box, msg, btn;
+    ret = new Promise(function(res, rej){});
+    if (typeof this.opt.fatal === 'function') {
+      if (this._fatal) {
+        return ret;
+      }
+      this._fatal = true;
+      try {
+        this.opt.fatal.call(this, e);
+      } catch (e$) {
+        e2 = e$;
+        console.error(e2);
+      }
+      return ret;
+    }
+    if (this._fatalNode) {
+      if (!document.body.contains(this._fatalNode)) {
+        document.body.appendChild(this._fatalNode);
+      }
+      return ret;
+    }
+    node = document.createElement('div');
+    node.className = 'ldcvmgr-fatal';
+    node.setAttribute('style', ["position:fixed", "top:0", "left:0", "width:100%", "height:100%", "z-index:2147483647", "display:flex", "align-items:center", "justify-content:center", "background:rgba(0,0,0,0.5)", "font-family:sans-serif", "color:#333"].join(';'));
+    box = document.createElement('div');
+    box.setAttribute('style', ["max-width:20rem", "margin:1rem", "padding:1.5rem", "border-radius:0.5rem", "background:white", "box-shadow:0 0.5rem 2rem rgba(0,0,0,0.3)", "text-align:center"].join(';'));
+    msg = document.createElement('div');
+    msg.setAttribute('style', "margin-bottom:1.5rem;line-height:1.5");
+    msg.textContent = this.opt.fatalMessage || "Something is wrong. Please reload and try again.";
+    btn = document.createElement('button');
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('style', ["padding:0.5rem 1.5rem", "border:none", "border-radius:0.25rem", "background:#333", "color:white", "cursor:pointer", "font-size:1rem"].join(';'));
+    btn.textContent = this.opt.fatalAction || "Reload";
+    btn.addEventListener('click', function(){
+      return location.reload();
+    });
+    box.appendChild(msg);
+    box.appendChild(btn);
+    node.appendChild(box);
+    this._fatalNode = node;
+    document.body.appendChild(node);
+    return ret;
   },
   _id: function(o){
     if (typeof o === 'object') {
